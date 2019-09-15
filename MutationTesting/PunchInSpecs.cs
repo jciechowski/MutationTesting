@@ -10,6 +10,7 @@ namespace MutationTesting
         [InlineData(15, true)]
         [InlineData(-15, false)]
         [InlineData(0, true)]
+        [InlineData(360, false)]
         [Theory]
         public void CanPunchInForSpecificDate(double punchInDelay, bool expectedResult)
         {
