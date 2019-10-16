@@ -4,22 +4,26 @@ namespace BusinessLogic
 {
     public class Shift
     {
-        public Shift(DateTime startTime, DateTime endTime, long employeeId, long departmentId)
+        private DateTime StartTime { get; }
+        private DateTime EndTime { get; }
+        public long EmployeeId { get; }
+
+        public Shift(DateTime startTime, DateTime endTime, long employeeId)
         {
             StartTime = startTime;
             EndTime = endTime;
             EmployeeId = employeeId;
-            DepartmentId = departmentId;
         }
 
-        private DateTime StartTime { get; }
-        private DateTime EndTime { get; }
-        private long EmployeeId { get; }
-        private long DepartmentId { get; }
-
-        public bool CanPunchIn(DateTime punchInDateTime)
+        public bool CanPunchIn(Employee employee, DateTime punchInDateTime)
         {
-            return punchInDateTime >= StartTime && punchInDateTime < EndTime;
+            var shiftBelongsToEmployee = employee.Id == EmployeeId;
+            var punchedInAfterStart = punchInDateTime >= StartTime;
+            var punchedInBeforeEnd = punchInDateTime < EndTime;
+
+            if (!shiftBelongsToEmployee) return false;
+
+            return punchedInBeforeEnd && punchedInAfterStart;
         }
     }
 }
