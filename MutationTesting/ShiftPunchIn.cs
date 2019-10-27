@@ -7,71 +7,80 @@ namespace MutationTesting
 {
     public class ShiftPunchIn
     {
-        [Fact]
-        public void IsForbiddenAfterEndTime()
-        {
-            var employee = new Employee(1);
-            var endTime = DateTime.Now.AddHours(1);
-
-            var shift = new ShiftBuilder().WithEmployee(employee.Id).WithEndTime(DateTime.Now).Build();
-
-            shift.CanPunchIn(employee, endTime).Should().BeFalse();
-        }
-
-        [Fact]
-        public void IsForbiddenAtEndTime()
-        {
-            var employee = new Employee(1);
-            var endTime = DateTime.Now.AddHours(-12);
-
-            var shift = new ShiftBuilder().WithEmployee(employee.Id).WithEndTime(endTime).Build();
-
-            shift.CanPunchIn(employee, endTime).Should().BeFalse();
-        }
-
-        [Fact]
-        public void IsForbiddenForPastShifts()
-        {
-            var employee = new Employee(1);
-
-            var shift = new ShiftBuilder().WithEmployee(employee.Id).Build();
-
-            shift.CanPunchIn(employee, DateTime.Now).Should().BeFalse();
-        }
+        private int _employeeId = 1;
 
         [Fact]
         public void IsForbiddenForWrongEmployee()
         {
-            var employee = new Employee(-1);
-            var otherEmployee = new Employee(1);
+            var otherEmployee = _employeeId+1;
 
-            var startTime = DateTime.Now;
-            var shift = new ShiftBuilder().WithEmployee(otherEmployee.Id).WithStartTime(startTime).Build();
+            var shift = new ShiftBuilder()
+                .WithEmployeeId(otherEmployee)
+                .Build();
 
-
-            shift.CanPunchIn(employee, startTime).Should().BeFalse();
+            var punchInTime = DateTime.Now;
+            shift.CanPunchIn(_employeeId, punchInTime).Should().BeFalse();
         }
 
         [Fact]
-        public void IsPossibleAtStartTime()
+        public void IsForbiddenAfterShiftEnd()
         {
-            var employee = new Employee(1);
-            var startTime = DateTime.Now.AddDays(-1);
+            var shift = new ShiftBuilder()
+                .WithEmployeeId(_employeeId)
+                .Build();
 
-            var shift = new ShiftBuilder().WithEmployee(employee.Id).WithStartTime(startTime).Build();
+            var punchInTime = DateTime.Now.AddHours(12);
 
+            shift.CanPunchIn(_employeeId, punchInTime).Should().BeFalse();
+        }
 
-            shift.CanPunchIn(employee, startTime).Should().BeTrue();
+        [Fact]
+        public void IsForbiddenBeforeShiftStart()
+        {
+            var shift = new ShiftBuilder()
+                .WithEmployeeId(_employeeId)
+                .Build();
+
+            var punchInTime = DateTime.Now.AddHours(-12);
+
+            shift.CanPunchIn(_employeeId, punchInTime).Should().BeFalse();
+        }
+
+        [Fact]
+        public void IsAllowedExactlyAtShiftStart()
+        {
+            var punchInTime = DateTime.Now.AddHours(-4);
+            var startTime = punchInTime;
+
+            var shift = new ShiftBuilder()
+                .WithEmployeeId(_employeeId)
+                .WithStartTime(startTime)
+                .Build();
+
+            shift.CanPunchIn(_employeeId, punchInTime).Should().BeTrue();
+        }
+
+        [Fact]
+        public void IsForbiddenExactlyAtEndTime()
+        {
+            var punchInTime = DateTime.Now;
+            var endTime = punchInTime;
+
+            var shift = new ShiftBuilder()
+                .WithEmployeeId(_employeeId)
+                .WithEndTime(endTime).Build();
+
+            shift.CanPunchIn(_employeeId, punchInTime).Should().BeFalse();
         }
     }
 
     public class ShiftBuilder
     {
         private long _employeeId = 1;
-        private DateTime _endTime = DateTime.Now.AddHours(-4);
-        private DateTime _startTime = DateTime.Now.AddHours(-12);
+        private DateTime _startTime = DateTime.Now.AddHours(-4);
+        private DateTime _endTime = DateTime.Now.AddHours(4);
 
-        public ShiftBuilder WithEmployee(long employeeId)
+        public ShiftBuilder WithEmployeeId(long employeeId)
         {
             _employeeId = employeeId;
             return this;
@@ -91,7 +100,7 @@ namespace MutationTesting
 
         public Shift Build()
         {
-            return new Shift(_startTime, _endTime, _employeeId);
+            return new Shift(_employeeId, _startTime, _endTime);
         }
     }
 }

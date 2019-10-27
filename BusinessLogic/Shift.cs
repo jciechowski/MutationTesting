@@ -6,24 +6,22 @@ namespace BusinessLogic
     {
         private DateTime StartTime { get; }
         private DateTime EndTime { get; }
-        public long EmployeeId { get; }
+        private long EmployeeId { get; }
 
-        public Shift(DateTime startTime, DateTime endTime, long employeeId)
+        public Shift(long employeeId, DateTime startTime, DateTime endTime)
         {
             StartTime = startTime;
             EndTime = endTime;
             EmployeeId = employeeId;
         }
 
-        public bool CanPunchIn(Employee employee, DateTime punchInDateTime)
+        public bool CanPunchIn(long employeeId, DateTime punchInDateTime)
         {
-            var shiftBelongsToEmployee = employee.Id == EmployeeId;
+            var shiftBelongsToEmployee = employeeId == EmployeeId;
             var punchedInAfterStart = punchInDateTime >= StartTime;
             var punchedInBeforeEnd = punchInDateTime < EndTime;
 
-            if (!shiftBelongsToEmployee) return false;
-
-            return punchedInBeforeEnd && punchedInAfterStart;
+            return shiftBelongsToEmployee && punchedInAfterStart && punchedInBeforeEnd;
         }
     }
 }
