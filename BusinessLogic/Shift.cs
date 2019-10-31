@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BusinessLogic
 {
@@ -7,6 +9,11 @@ namespace BusinessLogic
         private DateTime StartTime { get; }
         private DateTime EndTime { get; }
         private long EmployeeId { get; }
+
+        public Shift()
+        {
+            
+        }
 
         public Shift(long employeeId, DateTime startTime, DateTime endTime)
         {
@@ -22,6 +29,18 @@ namespace BusinessLogic
             var punchedInBeforeEnd = punchInDateTime < EndTime;
 
             return shiftBelongsToEmployee && punchedInAfterStart && punchedInBeforeEnd;
+        }
+
+        public bool HasAnyShifts(long employeeId)
+        {
+            var userShifts = new Dictionary<long, Shift>()
+            {
+                {1, new Shift(1, DateTime.Now, DateTime.Now.AddHours(4))},
+                {2, new Shift(1, DateTime.Now, DateTime.Now.AddHours(4))},
+                {3, new Shift(1, DateTime.Now, DateTime.Now.AddHours(4))}
+            };
+
+            return userShifts.Keys.Any(key => key == employeeId);
         }
     }
 }

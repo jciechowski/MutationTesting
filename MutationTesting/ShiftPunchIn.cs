@@ -72,6 +72,22 @@ namespace MutationTesting
 
             shift.CanPunchIn(_employeeId, punchInTime).Should().BeFalse();
         }
+
+        [Fact]
+        public void FindAssignedShifts()
+        {
+            var shift = new Shift();
+
+            shift.HasAnyShifts(_employeeId).Should().BeTrue();
+        }
+
+        [Fact]
+        public void NoAssignedShifts()
+        {
+            var shift = new Shift();
+
+            shift.HasAnyShifts(666).Should().BeFalse();
+        }
     }
 
     public class ShiftBuilder
