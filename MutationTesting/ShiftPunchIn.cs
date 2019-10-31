@@ -7,70 +7,43 @@ namespace MutationTesting
 {
     public class ShiftPunchIn
     {
-        private int _employeeId = 1;
+        private const int EmployeeId = 1;
 
         [Fact]
         public void IsForbiddenForWrongEmployee()
         {
-            var otherEmployee = _employeeId+1;
+            var otherEmployee = EmployeeId+1;
 
             var shift = new ShiftBuilder()
                 .WithEmployeeId(otherEmployee)
                 .Build();
 
             var punchInTime = DateTime.Now;
-            shift.CanPunchIn(_employeeId, punchInTime).Should().BeFalse();
+            shift.CanPunchIn(EmployeeId, punchInTime).Should().BeFalse();
         }
 
         [Fact]
         public void IsForbiddenAfterShiftEnd()
         {
             var shift = new ShiftBuilder()
-                .WithEmployeeId(_employeeId)
+                .WithEmployeeId(EmployeeId)
                 .Build();
 
             var punchInTime = DateTime.Now.AddHours(12);
 
-            shift.CanPunchIn(_employeeId, punchInTime).Should().BeFalse();
+            shift.CanPunchIn(EmployeeId, punchInTime).Should().BeFalse();
         }
 
         [Fact]
         public void IsForbiddenBeforeShiftStart()
         {
             var shift = new ShiftBuilder()
-                .WithEmployeeId(_employeeId)
+                .WithEmployeeId(EmployeeId)
                 .Build();
 
             var punchInTime = DateTime.Now.AddHours(-12);
 
-            shift.CanPunchIn(_employeeId, punchInTime).Should().BeFalse();
-        }
-
-        [Fact]
-        public void IsAllowedExactlyAtShiftStart()
-        {
-            var punchInTime = DateTime.Now.AddHours(-4);
-            var startTime = punchInTime;
-
-            var shift = new ShiftBuilder()
-                .WithEmployeeId(_employeeId)
-                .WithStartTime(startTime)
-                .Build();
-
-            shift.CanPunchIn(_employeeId, punchInTime).Should().BeTrue();
-        }
-
-        [Fact]
-        public void IsForbiddenExactlyAtEndTime()
-        {
-            var punchInTime = DateTime.Now;
-            var endTime = punchInTime;
-
-            var shift = new ShiftBuilder()
-                .WithEmployeeId(_employeeId)
-                .WithEndTime(endTime).Build();
-
-            shift.CanPunchIn(_employeeId, punchInTime).Should().BeFalse();
+            shift.CanPunchIn(EmployeeId, punchInTime).Should().BeFalse();
         }
     }
 
